@@ -11,9 +11,9 @@ public_folder: /img
 collections:
   - name: "articles"
     label: "Articles"
-    folder: "data/articles"
+    folder: "data"
     create: false
     #slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - {label: "Title", name: "title", widget: "string"}
-      - {label: "Body", name: "body", widget: "html"}
+      - {label: "Body", name: "body", widget: "text"}
