@@ -4,9 +4,57 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
+  <link rel="stylesheet" href="https://unpkg.com/draft-js@0.11.7/dist/Draft.css"/>
 </head>
 <body>
   <!-- Include the script that builds the page and powers Netlify CMS -->
   <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/create-react-class@15.6.3/create-react-class.min.js"></script>
+  <script src="https://unpkg.com/immutable@3.8.2/dist/immutable.js"></script>
+  <script src="https://unpkg.com/draft-js@0.11.7/dist/Draft.js"></script>
+  <script src="https://unpkg.com/react-dom@16.4.0/umd/react-dom-server.browser.development.js"></script>
+  <script src="https://unpkg.com/draft-convert@2.1.10/dist/draft-convert.js"></script>
+  <script src="/header-footer.js"></script>
+  <script>
+    var DraftJSControl = createReactClass({
+      getValue: function() {
+        return this.props.value ? this.props.value : '';
+      },
+
+      getInitialState: function() {
+        const blocksFromHTML = Draft.convertFromHTML(this.getValue());
+        const state = Draft.ContentState.createFromBlockArray(
+          blocksFromHTML.contentBlocks,
+          blocksFromHTML.entityMap,
+        );
+        return {editorState: Draft.EditorState.createWithContent(state)}
+      },
+
+      onChange: function(editorState) {
+        this.setState({editorState});
+        this.props.value = DraftConvert.convertToHTML(editorState.getCurrentContent());
+      },
+
+      render: function() {
+        return React.createElement(Draft.Editor, {editorState: this.state.editorState, onChange: this.onChange, className: this.props.classNameWrapper, value: this.props.value}, null)
+      },
+
+    });
+
+    const DraftJSPreview = createReactClass({
+      getValue: function() {
+        return this.props.value ? this.props.value : '';
+      },
+
+      render: function() {
+        return React.createElement('div', {dangerouslySetInnerHTML: {__html: `${SAHeader}${this.getValue()}${SAFooter}`}})
+      }
+    });
+
+    CMS.registerWidget('draftjs', DraftJSControl, DraftJSPreview)
+    CMS.registerPreviewStyle('https://p13.zdassets.com/hc/theming_assets/828209/575468/style.css')
+  </script>
 </body>
 </html>
